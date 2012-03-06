@@ -68,7 +68,8 @@
 - (IBAction)refresh:(id)sender
 {
     NSInteger imagePerPage = 100;
-    NSString *url = [NSString stringWithFormat:@"http://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=1dcfc4d60751c78085a217baf3dd7a51&format=json&nojsoncallback=1", imagePerPage];
+    
+    NSString *url = [NSString stringWithFormat:@"http://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=45de36b3a728f8f3fc23401f4e7bced5&per_page=%d&format=json&nojsoncallback=1", imagePerPage];
     
     ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:url]];
     
