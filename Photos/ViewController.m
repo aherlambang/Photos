@@ -7,7 +7,7 @@
 //
 
 #import "ViewController.h"
-#import "ASIHTTPRequest.h"
+#import "AFNetworking.h"
 #import "JSONKit.h"
 
 @implementation ViewController
@@ -70,15 +70,9 @@
     NSInteger imagePerPage = 100;
     
     NSString *url = [NSString stringWithFormat:@"http://api.flickr.com/services/rest/?method=flickr.interestingness.getList&api_key=ccb1a44ee5bbf5b72ab0aff810fbeb43&per_page=%d&format=json&nojsoncallback=1", imagePerPage];
-    
-    ASIHTTPRequest *request = [[ASIHTTPRequest alloc] initWithURL:[NSURL URLWithString:url]];
-    
-    [request setCompletionBlock:^{
-        //NSLog(@"%@", [request responseString]);
-        
-        NSString *str = [request responseString];
-        NSDictionary *entries = [[str objectFromJSONString] valueForKey:@"photos"];
-        
+    NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:url]];
+    AFJSONRequestOperation *request = [AFJSONRequestOperation JSONRequestOperationWithRequest:urlRequest success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
+        NSDictionary *entries = [JSON valueForKey:@"photos"];
         NSArray *items = [entries valueForKey:@"photo"];
         
         CGFloat imageViewSize = 100.0f;
@@ -108,19 +102,16 @@
                 x = offset;
                 y += offset + iv.frame.size.width;
             }
-            
-            [iv release];
+        
         }
         
         CGFloat height = (y > self.scrollView_.frame.size.height) ? y : self.scrollView_.frame.size.height;
         self.scrollView_.contentSize = CGSizeMake(self.scrollView_.frame.size.width, height);
+
+    } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id JSON) {
+           NSLog(@"Error %@", [error description]);
     }];
-    
-    [request setFailedBlock:^{
-        NSLog(@"Error %@", [[request error] description]);
-    }];
-    
-    [request startAsynchronous];
+    [request start];
 
 }
 
